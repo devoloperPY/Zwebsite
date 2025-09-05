@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1e1e">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/h1K1zJ2/ngl-logo-square.png"> <link rel="manifest" href="manifest.json">
+    <title>NGL Sender</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NGL Sender</h1>
+            <p>Kirim pesan NGL tanpa batas</p>
+        </header>
+
+        <section class="card settings">
+            <h2>Pengaturan Umum</h2>
+            <div class="form-group">
+                <label for="targets">👥 Username Target (pisahkan dengan koma)</label>
+                <input type="text" id="targets" placeholder="user1, user2, ...">
+            </div>
+            <div class="form-group">
+                <label for="gameMode">🎮 Mode Permainan</label>
+                <select id="gameMode"></select>
+            </div>
+        </section>
+
+        <section class="card messages">
+            <h2>Pesan NGL</h2>
+            <div class="form-group">
+                <label for="messageType">✉️ Sumber Pesan</label>
+                <select id="messageType">
+                    <option value="preset">📚 Pilih dari Preset</option>
+                    <option value="custom">📝 Tulis Pesan Sendiri</option>
+                </select>
+            </div>
+            <div class="form-group" id="preset-group">
+                <label for="presetChoice">📚 Kategori Preset</label>
+                <select id="presetChoice"></select>
+            </div>
+            <div class="form-group" id="custom-group" style="display: none;">
+                <label for="customMessages">✍️ Pesan Custom (pisahkan dengan | )</label>
+                <textarea id="customMessages" placeholder="hai | apa kabar? | spill dong"></textarea>
+            </div>
+        </section>
+
+        <section class="card advanced">
+            <h2>Pengaturan Lanjutan</h2>
+            <div class="form-group">
+                <label for="count">🔢 Jumlah Kirim</label>
+                <input type="text" id="count" value="100" placeholder="100 atau infinity">
+            </div>
+            <div class="form-group">
+                <label for="delay">⏱️ Jeda Waktu (contoh: 3s, 2-5s, 1m, 1h)</label>
+                <input type="text" id="delay" value="3-7s">
+            </div>
+        </section>
+
+        <button id="start-btn" class="primary-btn">🚀 Mulai Kirim</button>
+
+        <section class="card progress-section" id="progress-card" style="display: none;">
+            <h2>Proses Berjalan...</h2>
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="progress-text">0 / 100</p>
+            <p id="status-message" style="margin-top: 10px; font-size: 0.8em; color: var(--text-muted);"></p>
+        </section>
+        
+        <footer>
+            <p>&copy; 2023 Kaizen NGL Sender</p>
+            <p>Developer: MFH</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

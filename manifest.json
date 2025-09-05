@@ -1,0 +1,20 @@
+{
+    "name": "NGL Sender",
+    "short_name": "NGL Sender",
+    "icons": [
+        {
+            "src": "https://i.ibb.co/h1K1zJ2/ngl-logo-square.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://i.ibb.co/h1K1zJ2/ngl-logo-square.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#1e1e1e",
+    "theme_color": "#BB86FC"
+}
